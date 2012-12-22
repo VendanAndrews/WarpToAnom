@@ -36,6 +36,7 @@ x64/
 *.vspscc
 *.vssscc
 .builds
+*.vshost.*
 
 # Visual C++ cache files
 ipch/
@@ -89,7 +90,7 @@ csx
 AppPackages/
 
 # Others
-[Bb]in
+#[Bb]in
 [Oo]bj
 sql
 TestResults
