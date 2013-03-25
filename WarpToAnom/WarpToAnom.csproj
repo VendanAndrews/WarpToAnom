@@ -8,7 +8,7 @@
     <ProjectGuid>{5CD92A8E-954E-42F3-9EFB-448BF40C4FF0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
+    <RootNamespace>WarpToAnom</RootNamespace>
     <AssemblyName>WarpToAnom</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -50,11 +50,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ConsoleApplication1.Program</StartupObject>
+    <StartupObject>WarpToAnom.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DirectEve">
-      <HintPath>..\DirectEve.dll</HintPath>
+    <Reference Include="EveCom">
+      <HintPath>..\..\EveCom.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Lavish.InnerSpace">
       <HintPath>..\..\..\..\IS DLLs\Lavish.InnerSpace.dll</HintPath>

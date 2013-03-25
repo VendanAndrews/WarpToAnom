@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ConsoleApplication1.Properties {
+namespace WarpToAnom.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

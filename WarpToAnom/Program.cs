@@ -5,109 +5,101 @@ using System.Text;
 using System.Xml;
 using System.Reflection;
 using System.IO;
+using EveCom;
+using InnerSpaceAPI;
+using LavishScriptAPI;
 
-namespace ConsoleApplication1
+namespace WarpToAnom
 {
-    using DirectEve;
-    using LavishScriptAPI;
-
     class Program
     {
-        private static DirectEve _directEve;
-        bool Finished = false;
-        string State = "Open";
-        private static DateTime _lastPulse;
+        static bool Finished = false;
+        static string State = "Open";
+        static DateTime _lastPulse;
+        static public int Distance = 0;
 
-        private static System.Collections.Generic.List<string> Difficulties = new System.Collections.Generic.List<string>();
+        static System.Collections.Generic.List<string> Difficulties = new System.Collections.Generic.List<string>();
 
-
-        private void OpenScanner()
+        static void OpenScanner()
         {
-            var scanner = _directEve.Windows.OfType<DirectScannerWindow>().FirstOrDefault();
-            if (scanner == null)
+            if (Window.Scanner == null)
             {
-                _directEve.ExecuteCommand(DirectCmd.OpenScanner);
+                ScannerWindow.Open();
             }
-        }
-    
-        private void DoSystemScan()
-        {
-            var scanner = _directEve.Windows.OfType<DirectScannerWindow>().FirstOrDefault();
-            if (scanner != null & scanner.IsReady)
-            {
-                scanner.Analyze();
-            }
+
+
         }
 
-        private void WarpTo()
+        static void DoSystemScan()
         {
-            var scanner = _directEve.Windows.OfType<DirectScannerWindow>().FirstOrDefault();
-            if (scanner != null & scanner.IsReady)
+            if (Window.Scanner != null)
             {
-                System.Collections.Generic.List<DirectSystemScanResult> Results = new System.Collections.Generic.List<DirectSystemScanResult>();
+                Window.Scanner.Analyze();
+            }
+        }
+
+        static void WarpTo()
+        {
+            if (Window.Scanner != null)
+            {
+                List<SystemScanResult> ScanResults = Window.Scanner.ScanResults.ToList();
+                List<SystemScanResult> Results = new List<SystemScanResult>();
 
                 foreach (string Difficulty in Difficulties)
                 {
-                    foreach (var result in scanner.SystemScanResults)
+                    foreach (SystemScanResult result in ScanResults)
                     {
-                        if (result.SignalStrength > 99)
+                        if (result.Certainty > .99 && !Properties.Settings.Default.UsedScans.Contains(result.ID))
                         {
-                            if (result.Type.Contains(Difficulty))
+                            InnerSpace.Echo("Certainty: " + result.Certainty + " Name: " + result.DungeonName + " ScanGroupID: " + result.ScanGroupID);
+                            if (result.DungeonName.Contains(Difficulty))
                             {
-                                Results.Add(result);                     
+                                Results.Add(result);
                             }
                         }
                     }
                 }
-                
 
-                foreach (var result in Results)
-                {
-                    if (!Properties.Settings.Default.UsedScans.Contains(result.ID))
-                    {
-                        Properties.Settings.Default.UsedScans.Add(result.ID);
-                        InnerSpaceAPI.InnerSpace.Echo("Warping to " + result.Type);
-                        result.WarpTo();
-                        return;
-                    }
-                }
-                Properties.Settings.Default.UsedScans.Clear();
-
+                InnerSpace.Echo("Warping to " + Results[0].DungeonName);
                 Properties.Settings.Default.UsedScans.Add(Results[0].ID);
-                InnerSpaceAPI.InnerSpace.Echo("Warping to " + Results[0].Type);
-                Results[0].WarpTo();
-          
-            }            
+
+                if (Session.InFleet && Fleet.Members.First(member => member.ID == Me.CharID).Role != FleetRole.SquadMember)
+                {
+                    Results[0].WarpFleetTo(Distance);
+                }
+                else
+                {
+                    Results[0].WarpTo(Distance);
+                }
+            }
         }
 
-        private void CloseScanner()
+        static void CloseScanner()
         {
-            var scanner = _directEve.Windows.OfType<DirectScannerWindow>().FirstOrDefault();
-            if (scanner != null & scanner.IsReady)
+            if (Window.Scanner != null)
             {
-                scanner.Close();
+                Window.Scanner.Close();
             }
 
         }
 
-        void OnFrame(object sender, EventArgs eventArgs)
-        {
 
+        static void OnFrame(object sender, EventArgs eventArgs)
+        {
             if (State == "Open")
             {
-                this.OpenScanner();
+                OpenScanner();
                 State = "Scan";
                 _lastPulse = DateTime.UtcNow;
                 return;
             }
-
             if (State == "Scan")
             {
                 if (DateTime.UtcNow.Subtract(_lastPulse).TotalMilliseconds < 1500)
                 {
                     return;
                 }
-                this.DoSystemScan();
+                DoSystemScan();
                 State = "Warp";
                 _lastPulse = DateTime.UtcNow;
                 return;
@@ -120,7 +112,7 @@ namespace ConsoleApplication1
                 }
                 try
                 {
-                    this.WarpTo();
+                    WarpTo();
                 }
                 catch
                 {
@@ -132,47 +124,26 @@ namespace ConsoleApplication1
             }
             if (State == "Close")
             {
-                if (DateTime.UtcNow.Subtract(_lastPulse).TotalMilliseconds < 1500)
+                if (DateTime.UtcNow.Subtract(_lastPulse).TotalMilliseconds < 10000)
                 {
                     return;
                 }
-                this.CloseScanner();
+                CloseScanner();
                 State = "Finished";
                 _lastPulse = DateTime.UtcNow;
                 return;
             }
-            this.Finished = true;
+            Finished = true;
         }
 
-
-
-
-        void Run()
+        static void Run()
         {
 
-            try
-            {
-                _directEve = new DirectEve();
-                if (_directEve.HasSupportInstances())
-                {
-                    _directEve.OnFrame += OnFrame;
-                    while (!Finished)
-                    {
-                        System.Threading.Thread.Sleep(50);
-                    }
+            EveCom.EVEFrame.OnFrame += OnFrame;
 
-                    _directEve.Dispose();
-                }
-                else
-                {
-                    InnerSpaceAPI.InnerSpace.Echo("You do not have any support instances, closing");
-                    _directEve.Dispose();
-                    return;
-                }
-            }
-            catch
+            while (!Finished)
             {
-                InnerSpaceAPI.InnerSpace.Echo("Something strange happened");
+                System.Threading.Thread.Sleep(50);
             }
 
         }
@@ -203,8 +174,13 @@ namespace ConsoleApplication1
                 InnerSpaceAPI.InnerSpace.Echo("Problem reading WarpToAnom.xml");
             }
 
-            Program prog = new Program();
-            prog.Run();
+            try
+            {
+                Distance = int.Parse(args[1]);
+            }
+            catch { }
+
+            Run();
 
             Properties.Settings.Default.Save();
         }
