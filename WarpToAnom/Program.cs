@@ -50,7 +50,7 @@ namespace ConsoleApplication1
                 {
                     foreach (var result in scanner.SystemScanResults)
                     {
-                        if (result.SignalStrength > 99)
+                        if (result.SignalStrength >= 1)
                         {
                             if (result.TypeName.Contains(Difficulty))
                             {
