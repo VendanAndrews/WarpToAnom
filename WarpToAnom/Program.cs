@@ -52,7 +52,7 @@ namespace ConsoleApplication1
                     {
                         if (result.SignalStrength > 99)
                         {
-                            if (result.Type.Contains(Difficulty))
+                            if (result.TypeName.Contains(Difficulty))
                             {
                                 Results.Add(result);                     
                             }
@@ -63,18 +63,18 @@ namespace ConsoleApplication1
 
                 foreach (var result in Results)
                 {
-                    if (!Properties.Settings.Default.UsedScans.Contains(result.ID))
+                    if (!Properties.Settings.Default.UsedScans.Contains(result.Id))
                     {
-                        Properties.Settings.Default.UsedScans.Add(result.ID);
-                        InnerSpaceAPI.InnerSpace.Echo("Warping to " + result.Type);
+                        Properties.Settings.Default.UsedScans.Add(result.Id);
+                        InnerSpaceAPI.InnerSpace.Echo("Warping to " + result.TypeName);
                         result.WarpTo();
                         return;
                     }
                 }
                 Properties.Settings.Default.UsedScans.Clear();
 
-                Properties.Settings.Default.UsedScans.Add(Results[0].ID);
-                InnerSpaceAPI.InnerSpace.Echo("Warping to " + Results[0].Type);
+                Properties.Settings.Default.UsedScans.Add(Results[0].Id);
+                InnerSpaceAPI.InnerSpace.Echo("Warping to " + Results[0].TypeName);
                 Results[0].WarpTo();
           
             }            
