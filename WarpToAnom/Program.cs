@@ -184,6 +184,42 @@ namespace WarpToAnom
                 Distance = int.Parse(args[0]);
             }
             catch { }
+            /* 0
+             * 10
+             * 20
+             * 30
+             * 50
+             * 70
+             * 100
+             */
+            if (Distance < 5000)
+            {
+                Distance = 0;
+            }
+            else if(Distance < 15000)
+            {
+                Distance = 10000;
+            }
+            else if (Distance < 25000)
+            {
+                Distance = 20000;
+            }
+            else if (Distance < 35000)
+            {
+                Distance = 30000;
+            }
+            else if (Distance < 60000)
+            {
+                Distance = 50000;
+            }
+            else if (Distance < 85000)
+            {
+                Distance = 70000;
+            }
+            else
+            {
+                Distance = 100000;
+            }
 
             Run();
 
