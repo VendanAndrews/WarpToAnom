@@ -176,7 +176,7 @@ namespace WarpToAnom
 
             try
             {
-                Distance = int.Parse(args[1]);
+                Distance = int.Parse(args[0]);
             }
             catch { }
 
