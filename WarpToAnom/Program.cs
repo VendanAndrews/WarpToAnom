@@ -162,6 +162,12 @@ namespace WarpToAnom
                 Properties.Settings.Default.UsedScans = new System.Collections.Specialized.StringCollection();
             }
 
+            if (args.Length > 0 && args[0].ToLower() == "clear")
+            {
+                Properties.Settings.Default.UsedScans = new System.Collections.Specialized.StringCollection();
+                return;
+            }
+
             try
             {
                 XmlTextReader reader = new XmlTextReader(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\WarpToAnom.xml");
