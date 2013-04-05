@@ -60,7 +60,7 @@ namespace WarpToAnom
                     }
                 }
 
-                InnerSpace.Echo("Warping to " + Results[0].DungeonName);
+                InnerSpace.Echo("Warping to " + Results[0].DungeonName + " at distance of " + Distance.ToString());
                 Properties.Settings.Default.UsedScans.Add(Results[0].ID);
 
                 if (Session.InFleet && Fleet.Members.First(member => member.ID == Me.CharID).Role != FleetRole.SquadMember)
