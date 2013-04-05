@@ -86,6 +86,10 @@ namespace WarpToAnom
 
         static void OnFrame(object sender, EventArgs eventArgs)
         {
+            if (!Session.Safe || Session.NextSessionChange > Session.Now)
+            {
+                return;
+            }
             if (State == "Open")
             {
                 OpenScanner();
@@ -152,6 +156,7 @@ namespace WarpToAnom
 
         static void Main(string[] args)
         {
+            InnerSpace.Echo("WarpToAnom Loaded");
             if (Properties.Settings.Default.UsedScans == null)
             {
                 Properties.Settings.Default.UsedScans = new System.Collections.Specialized.StringCollection();
