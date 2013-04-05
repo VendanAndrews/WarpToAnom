@@ -165,6 +165,7 @@ namespace WarpToAnom
             if (args.Length > 0 && args[0].ToLower() == "clear")
             {
                 Properties.Settings.Default.UsedScans = new System.Collections.Specialized.StringCollection();
+                Properties.Settings.Default.Save();
                 return;
             }
 
